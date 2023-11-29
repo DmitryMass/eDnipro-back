@@ -52,10 +52,7 @@ export class AuthController {
   @Post('login')
   @UsePipes(new ValidationPipe())
   @UseGuards(LocalAuthGuard)
-  async login(
-    @Request() req,
-    @Body() loginUserDto: LoginUserDto,
-  ): Promise<TLogin> {
+  login(@Request() req, @Body() loginUserDto: LoginUserDto): Promise<TLogin> {
     return this.authService.login(req.user);
   }
 
