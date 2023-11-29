@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import mongoose from 'mongoose';
@@ -15,6 +15,8 @@ export class User extends BaseDocument {
 
   @ApiProperty({ example: 'Smith', description: 'User last name' })
   @Prop({ default: '' })
+  lastName: string;
+
   @ApiProperty({
     example: 'jonhSmith12345@gmail.com',
     description: 'User email',
@@ -35,3 +37,5 @@ export class User extends BaseDocument {
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }])
   tasks: Task[];
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);

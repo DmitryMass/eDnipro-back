@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
 import mongoose from 'mongoose';
@@ -57,3 +57,5 @@ export class Task extends BaseDocument {
   @Prop({ default: Status.isOpen })
   status: Status;
 }
+
+export const TaskSchema = SchemaFactory.createForClass(Task);

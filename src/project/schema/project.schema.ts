@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { Task } from 'src/task/schema/task.schema';
@@ -34,3 +34,5 @@ export class Project extends BaseDocument {
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }])
   tasks: Task[];
 }
+
+export const ProjectSchema = SchemaFactory.createForClass(Project);
