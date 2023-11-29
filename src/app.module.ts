@@ -7,10 +7,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
     AuthModule,
+    ProjectModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
