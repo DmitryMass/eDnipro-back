@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { Project } from 'src/project/schema/project.schema';
 import { User } from 'src/user/schema/user.schema';
 import { BaseDocument } from 'src/utils/BaseDocument';
+import { File } from 'src/general-schemas/file.schema';
 
 enum Status {
   isOpen = 'isOpen',
@@ -56,6 +57,13 @@ export class Task extends BaseDocument {
   @IsEnum(Status)
   @Prop({ default: Status.isOpen })
   status: Status;
+
+  @ApiProperty({
+    example: 'model File Id',
+    description: 'ID of the file binded to this project.',
+  })
+  @Prop({ required: false, type: mongoose.Schema.Types.ObjectId, ref: 'File' })
+  file: File;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

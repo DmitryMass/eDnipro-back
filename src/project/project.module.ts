@@ -8,6 +8,7 @@ import { ProjectController } from './project.controller';
 import { Project, ProjectSchema } from './schema/project.schema';
 import { Task, TaskSchema } from 'src/task/schema/task.schema';
 import { ProjectService } from './project.service';
+import { File, FileSchema } from 'src/general-schemas/file.schema';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProjectService } from './project.service';
       { name: User.name, schema: UserSchema },
       { name: Project.name, schema: ProjectSchema },
       { name: Task.name, schema: TaskSchema },
+      { name: File.name, schema: FileSchema },
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
