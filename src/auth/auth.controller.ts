@@ -1,12 +1,13 @@
 import {
-  Controller,
-  Post,
-  UseGuards,
-  Request,
   Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseFilters,
+  UseGuards,
   UsePipes,
   ValidationPipe,
-  Get,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -19,13 +20,15 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { ErrorFilter } from 'src/middleware/error.middleware';
 import type { TLogin, TMessage } from 'src/types/types';
+import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegistrationDto } from './dto/registration-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
+@UseFilters(ErrorFilter)
 @ApiTags('User Authorization')
 @Controller('auth')
 export class AuthController {
