@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Project } from './schema/project.schema';
@@ -173,6 +174,29 @@ export class ProjectService {
       };
     } catch (err) {
       throw new ConflictException('Error occured when getting projects');
+    }
+  }
+
+  async getSearchedProjects(query: string): Promise<Project[]> {
+    try {
+      // Универсальный вариант поиска.
+      // Выключает регистр, а так же можно расширить все категории по которым мы можем искать проекты, можно добавить description , author и так далее / строкой указываем параметры не нужные в запросе
+      const projects = await this.projectModel.find(
+        {
+          $or: [{ title: { $regex: query, $options: 'i' } }],
+        },
+        '-tasks -authorOfСreation -file',
+      );
+
+      if (!projects) {
+        throw new NotFoundException('Projects not found');
+      }
+
+      return projects;
+    } catch (err) {
+      throw new InternalServerErrorException(
+        'Server error occured when searched projects',
+      );
     }
   }
 }

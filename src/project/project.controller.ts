@@ -100,4 +100,21 @@ export class ProjectController {
   ): Promise<PaginationResponse<Project>> {
     return this.projectService.getProjects(page, limit, sortBy);
   }
+
+  @ApiOperation({ summary: 'Search project by Title' })
+  @ApiBearerAuth('Token')
+  @ApiOkResponse({
+    description: 'Projects have successfully searched',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User does not have Token. User Unauthorized.',
+  })
+  @ApiNotFoundResponse({ description: 'Projects not found' })
+  @ApiInternalServerErrorResponse({
+    description: 'An error occurred when searching proejcts.',
+  })
+  @Get('search')
+  getSearchedProjects(@Query('q') query: string): Promise<Project[]> {
+    return this.projectService.getSearchedProjects(query);
+  }
 }
