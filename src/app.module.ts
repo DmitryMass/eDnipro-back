@@ -8,6 +8,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { ProjectModule } from './project/project.module';
+import { File, FileSchema } from './general-schemas/file.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ProjectModule } from './project/project.module';
           : '.env.development',
     }),
     MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forFeature([{ name: File.name, schema: FileSchema }]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
