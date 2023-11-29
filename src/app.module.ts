@@ -7,11 +7,13 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cdn-cloudinary/cloudinary.module';
 import { ProjectModule } from './project/project.module';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
     AuthModule,
     ProjectModule,
+    TaskModule,
     CloudinaryModule,
     ConfigModule.forRoot({
       isGlobal: true,
