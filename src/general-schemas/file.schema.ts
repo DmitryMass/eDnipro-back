@@ -14,10 +14,6 @@ export class File extends BaseDocument {
   @Prop({ required: true })
   file_originalName: string;
 
-  @ApiProperty({ example: '255Mb', description: 'File size' })
-  @Prop({ required: true })
-  file_size: number;
-
   @ApiProperty({ example: 'Content-type', description: 'File content-type' })
   @Prop({ required: true })
   file_contentType: string;

@@ -31,13 +31,6 @@ export class Project extends BaseDocument {
   @Prop({ required: true })
   description: string;
 
-  @ApiProperty({
-    example: '',
-    description: 'Description for current Task',
-  })
-  @Prop({ required: true })
-  imgPath: string;
-
   @ApiProperty({ description: 'Tasks of current project', type: [Task] })
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }])
   tasks: Task[];

@@ -8,6 +8,7 @@ import { ProjectController } from './project.controller';
 import { Project, ProjectSchema } from './schema/project.schema';
 import { Task, TaskSchema } from 'src/task/schema/task.schema';
 import { ProjectService } from './project.service';
+import { CloudinaryService } from 'src/cdn-cloudinary/cloudinary.service';
 import { File, FileSchema } from 'src/general-schemas/file.schema';
 
 @Module({
@@ -29,7 +30,7 @@ import { File, FileSchema } from 'src/general-schemas/file.schema';
     }),
   ],
   controllers: [ProjectController],
-  providers: [ProjectService],
+  providers: [ProjectService, CloudinaryService],
   exports: [ProjectService],
 })
 export class ProjectModule {}

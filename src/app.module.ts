@@ -1,19 +1,18 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { JwtModule } from '@nestjs/jwt';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { CloudinaryModule } from './cdn-cloudinary/cloudinary.module';
 import { ProjectModule } from './project/project.module';
-import { File, FileSchema } from './general-schemas/file.schema';
 
 @Module({
   imports: [
     AuthModule,
     ProjectModule,
+    CloudinaryModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
@@ -22,7 +21,6 @@ import { File, FileSchema } from './general-schemas/file.schema';
           : '.env.development',
     }),
     MongooseModule.forRoot(process.env.MONGO_URI),
-    MongooseModule.forFeature([{ name: File.name, schema: FileSchema }]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -30,9 +28,6 @@ import { File, FileSchema } from './general-schemas/file.schema';
         signOptions: { expiresIn: '3d' },
       }),
       inject: [ConfigService],
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src', 'uploadedFiles'),
     }),
   ],
   controllers: [AppController],
