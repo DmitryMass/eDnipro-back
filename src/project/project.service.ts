@@ -6,7 +6,7 @@ import {
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Project } from './schema/project.schema';
 import mongoose, { Model } from 'mongoose';
-import type { TMessage } from 'src/types/types';
+import type { PaginationResponse, TMessage } from 'src/types/types';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { User } from 'src/user/schema/user.schema';
 import { CloudinaryService } from 'src/cdn-cloudinary/cloudinary.service';
@@ -146,6 +146,33 @@ export class ProjectService {
       throw new ConflictException('Error when deleting the project');
     } finally {
       transactionSession.endSession();
+    }
+  }
+
+  async getProjects(
+    page: number,
+    limit: number,
+    sortBy: string = 'asc',
+  ): Promise<PaginationResponse<Project>> {
+    const skip = (page - 1) * limit;
+    try {
+      const projectsLength = await this.projectModel.find();
+      if (!projectsLength) {
+        throw new NotFoundException('Projects not found');
+      }
+
+      const paginatedProjects = await this.projectModel
+        .find()
+        .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+        .skip(skip)
+        .limit(limit);
+
+      return {
+        itemsPerPage: paginatedProjects,
+        total: projectsLength.length,
+      };
+    } catch (err) {
+      throw new ConflictException('Error occured when getting projects');
     }
   }
 }

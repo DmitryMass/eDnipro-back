@@ -14,3 +14,8 @@ export type TToken = {
 export type TMessage = {
   message: string;
 };
+
+export type PaginationResponse<T> = {
+  itemsPerPage: T[];
+  total: number;
+};
