@@ -49,7 +49,7 @@ export class TaskResponse extends BaseDocumentResponse {
   @ApiProperty()
   _id: string;
 
-  @ApiProperty({ type: UserResponse, required: false, description: 'wwwww' })
+  @ApiProperty({ type: UserResponse, required: false })
   perfomingBy: UserResponse;
 
   @ApiProperty()

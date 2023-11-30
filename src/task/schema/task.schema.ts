@@ -8,9 +8,9 @@ import { BaseDocument } from 'src/utils/BaseDocument';
 import { File } from 'src/general-schemas/file.schema';
 
 export enum Status {
-  isOpen = 'isOpen',
-  inProccess = 'inProccess',
-  isClosed = 'isClosed',
+  isOpen = 'isopen',
+  inProgress = 'inprogress',
+  isClosed = 'isclosed',
 }
 
 @Schema({
