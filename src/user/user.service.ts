@@ -1,8 +1,7 @@
 import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
   ConflictException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';

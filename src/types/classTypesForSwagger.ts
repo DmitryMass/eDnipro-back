@@ -107,3 +107,14 @@ export class PaginationProjectResponse {
   @ApiProperty()
   total: number;
 }
+
+export class TaskByProjectIdResponse {
+  @ApiProperty({ type: SearchedProjectsResponse })
+  project: SearchedProjectsResponse;
+
+  @ApiProperty({ type: TaskResponse, isArray: true })
+  tasks: TaskResponse[];
+
+  @ApiProperty()
+  total: number;
+}

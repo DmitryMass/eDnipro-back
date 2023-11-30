@@ -12,6 +12,7 @@ import { Task } from 'src/task/schema/task.schema';
 import {
   PaginationProjectResponse,
   ProjectResponse,
+  TaskByProjectIdResponse,
 } from 'src/types/classTypesForSwagger';
 import type { TMessage } from 'src/types/types';
 import { User } from 'src/user/schema/user.schema';
@@ -155,29 +156,60 @@ export class ProjectService {
     }
   }
 
-  async getOneProject(projectId: string): Promise<Project> {
+  async getTasksByProjectId(
+    projectId: string,
+    page: number = 1,
+    limit: number = 6,
+    sortBy: string = 'asc',
+    filteredStatus: string = 'all',
+  ): Promise<{ project: Project; tasks: Task[]; total: number }> {
+    const skip = (page - 1) * limit;
     try {
       const project = await this.projectModel
         .findById(projectId)
-        .populate({
-          path: 'tasks',
-          model: 'Task',
-          populate: {
-            path: 'file',
-            model: 'File',
-          },
-        })
-        .populate('file')
-        .populate('authorOfСreation');
+        .select('-authorOfСreation -file');
 
       if (!project) {
-        throw new NotFoundException(`Project by id: ${projectId} not found`);
+        throw new NotFoundException('Project not found');
+      }
+      if (filteredStatus === 'all') {
+        const tasks = await this.taskModel
+          .find({ projectId })
+          .populate('file')
+          .populate('perfomingBy')
+          .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+          .skip(skip)
+          .limit(limit);
+        if (!tasks) {
+          throw new NotFoundException('Tasks not found');
+        }
+
+        return {
+          tasks,
+          project,
+          total: project.tasks.length,
+        };
       }
 
-      return project;
+      const tasks = await this.taskModel
+        .find({ projectId, status: filteredStatus })
+        .populate('file')
+        .populate('perfomingBy')
+        .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+        .skip(skip)
+        .limit(limit);
+      if (!tasks) {
+        throw new NotFoundException('Tasks not found');
+      }
+
+      return {
+        tasks,
+        project,
+        total: project.tasks.length,
+      };
     } catch (err) {
-      throw new InternalServerErrorException(
-        'Server error occured when getting the project',
+      throw new ConflictException(
+        'Server error occured when getting or filtering tasks',
       );
     }
   }

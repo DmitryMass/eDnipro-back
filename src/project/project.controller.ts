@@ -34,6 +34,7 @@ import {
   PaginationProjectResponse,
   ProjectResponse,
   SearchedProjectsResponse,
+  TaskByProjectIdResponse,
 } from 'src/types/classTypesForSwagger';
 import type { TMessage } from 'src/types/types';
 import { fileUploadInterceptor } from 'src/utils/fileUploadInterceptor';
@@ -41,6 +42,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectService } from './project.service';
 import { Project } from './schema/project.schema';
+import { Task } from 'src/task/schema/task.schema';
 
 @UseFilters(ErrorFilter)
 @Controller('project')
@@ -95,11 +97,11 @@ export class ProjectController {
     return this.projectService.deleteProject(projectId);
   }
 
-  @ApiOperation({ summary: 'Get project' })
+  @ApiOperation({ summary: 'Get tasks by project id' })
   @ApiBearerAuth('Token')
   @ApiOkResponse({
-    description: 'Project has succesfully got',
-    type: ProjectResponse,
+    description: 'Tasks has succesfully got',
+    type: TaskByProjectIdResponse,
   })
   @ApiUnauthorizedResponse({
     description: 'User does not have access token. User unauthorized.',
@@ -110,8 +112,22 @@ export class ProjectController {
     description: 'Error when the project',
   })
   @Get('/:projectId')
-  getOneProject(@Param('projectId') projectId: string): Promise<Project> {
-    return this.projectService.getOneProject(projectId);
+  @ApiQuery({ name: 'sortBy', required: false, type: String })
+  @ApiQuery({ name: 'filteredStatus', required: false, type: String })
+  getTasksByProjectId(
+    @Param('projectId') projectId: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('sortBy') sortBy: string,
+    @Query('filteredStatus') filteredStatus: string,
+  ): Promise<{ project: Project; tasks: Task[]; total: number }> {
+    return this.projectService.getTasksByProjectId(
+      projectId,
+      page,
+      limit,
+      sortBy,
+      filteredStatus,
+    );
   }
 
   @ApiOperation({ summary: 'Get projects' })

@@ -1,11 +1,11 @@
 import {
+  Body,
   Controller,
   Param,
   Patch,
   Request,
   UseFilters,
   UseGuards,
-  Body,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -22,10 +22,10 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ErrorFilter } from 'src/middleware/error.middleware';
+import { ChangeStatusDto } from 'src/task/dto/change-task-status.dto';
 import { MessageResponse } from 'src/types/classTypesForSwagger';
 import { TMessage } from 'src/types/types';
 import { UserService } from './user.service';
-import { ChangeStatusDto } from 'src/task/dto/change-task-status.dto';
 
 @UseFilters(ErrorFilter)
 @Controller('user')
