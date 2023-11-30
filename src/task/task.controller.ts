@@ -10,6 +10,7 @@ import {
   ValidationPipe,
   Param,
   Get,
+  Put,
   Delete,
 } from '@nestjs/common';
 import {
@@ -31,6 +32,7 @@ import { TaskService } from './task.service';
 import { MessageResponse, TaskResponse } from 'src/types/classTypesForSwagger';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './schema/task.schema';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @UseFilters(ErrorFilter)
 @Controller('task')
@@ -94,5 +96,29 @@ export class TaskController {
   @Delete('delete/:taskId')
   deleteTask(@Param('taskId') taskId: string): Promise<TMessage> {
     return this.taskService.deleteTask(taskId);
+  }
+
+  @ApiOperation({ summary: 'Update current task' })
+  @ApiBearerAuth('Token')
+  @ApiOkResponse({
+    description: 'Task updated Successfully',
+    type: TaskResponse,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User does not have access token. User unauthorized.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiNotFoundResponse({ description: 'Task not found' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(fileUploadInterceptor)
+  @UsePipes(new ValidationPipe())
+  @Put('update-task/:taskId')
+  updateProject(
+    @Body() updateTaskDto: UpdateTaskDto,
+    @Param('taskId') taskId: string,
+    @UploadedFile()
+    file: Express.Multer.File,
+  ): Promise<Task> {
+    return this.taskService.updateTask(updateTaskDto, file, taskId);
   }
 }
