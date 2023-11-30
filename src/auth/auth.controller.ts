@@ -21,7 +21,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ErrorFilter } from 'src/middleware/error.middleware';
-import type { TLogin, TMessage } from 'src/types/types';
+import { type TLogin, type TMessage } from 'src/types/types';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegistrationDto } from './dto/registration-user.dto';
@@ -49,7 +49,9 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'User Login' })
-  @ApiOkResponse({ description: 'The user has successfully logged in' })
+  @ApiOkResponse({
+    description: 'The user has successfully logged in',
+  })
   @ApiUnauthorizedResponse({ description: 'Incorrect authorization data.' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @Post('login')

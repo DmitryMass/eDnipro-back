@@ -1,19 +1,24 @@
 import {
-  Injectable,
   ConflictException,
-  NotFoundException,
+  Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Project } from './schema/project.schema';
 import mongoose, { Model } from 'mongoose';
-import type { PaginationResponse, TMessage } from 'src/types/types';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { User } from 'src/user/schema/user.schema';
 import { CloudinaryService } from 'src/cdn-cloudinary/cloudinary.service';
 import { File } from 'src/general-schemas/file.schema';
 import { Task } from 'src/task/schema/task.schema';
+import {
+  PaginationProjectResponse,
+  ProjectResponse,
+  TaskByProjectIdResponse,
+} from 'src/types/classTypesForSwagger';
+import type { TMessage } from 'src/types/types';
+import { User } from 'src/user/schema/user.schema';
+import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { Project } from './schema/project.schema';
 
 @Injectable()
 export class ProjectService {
@@ -151,28 +156,60 @@ export class ProjectService {
     }
   }
 
-  async getOneProject(projectId: string): Promise<Project> {
+  async getTasksByProjectId(
+    projectId: string,
+    page: number = 1,
+    limit: number = 6,
+    sortBy: string = 'asc',
+    filteredStatus: string = 'all',
+  ): Promise<{ project: Project; tasks: Task[]; total: number }> {
+    const skip = (page - 1) * limit;
     try {
       const project = await this.projectModel
         .findById(projectId)
-        .populate({
-          path: 'tasks',
-          model: 'Task',
-          populate: {
-            path: 'file',
-            model: 'File',
-          },
-        })
-        .populate('file');
+        .select('-authorOfСreation -file');
 
       if (!project) {
-        throw new NotFoundException(`Project by id: ${projectId} not found`);
+        throw new NotFoundException('Project not found');
+      }
+      if (filteredStatus === 'all') {
+        const tasks = await this.taskModel
+          .find({ projectId })
+          .populate('file')
+          .populate('perfomingBy')
+          .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+          .skip(skip)
+          .limit(limit);
+        if (!tasks) {
+          throw new NotFoundException('Tasks not found');
+        }
+
+        return {
+          tasks,
+          project,
+          total: project.tasks.length,
+        };
       }
 
-      return project;
+      const tasks = await this.taskModel
+        .find({ projectId, status: filteredStatus })
+        .populate('file')
+        .populate('perfomingBy')
+        .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+        .skip(skip)
+        .limit(limit);
+      if (!tasks) {
+        throw new NotFoundException('Tasks not found');
+      }
+
+      return {
+        tasks,
+        project,
+        total: project.tasks.length,
+      };
     } catch (err) {
-      throw new InternalServerErrorException(
-        'Server error occured when getting the project',
+      throw new ConflictException(
+        'Server error occured when getting or filtering tasks',
       );
     }
   }
@@ -181,7 +218,7 @@ export class ProjectService {
     page: number,
     limit: number,
     sortBy: string = 'asc',
-  ): Promise<PaginationResponse<Project>> {
+  ): Promise<PaginationProjectResponse> {
     const skip = (page - 1) * limit;
     try {
       const projectsLength = await this.projectModel.find();
@@ -191,12 +228,14 @@ export class ProjectService {
 
       const paginatedProjects = await this.projectModel
         .find()
+        .populate('authorOfСreation')
+        .populate('file')
         .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
         .skip(skip)
         .limit(limit);
 
       return {
-        itemsPerPage: paginatedProjects,
+        itemsPerPage: paginatedProjects as any,
         total: projectsLength.length,
       };
     } catch (err) {
@@ -231,7 +270,7 @@ export class ProjectService {
     updateProjectDto: UpdateProjectDto,
     file: Express.Multer.File,
     projectId: string,
-  ): Promise<any> {
+  ): Promise<Project> {
     const transactionSession = await this.connection.startSession();
     const filePaths = {
       oldPath: '',

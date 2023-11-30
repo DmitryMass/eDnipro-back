@@ -1,5 +1,7 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export type TLogin = {
-  id: any;
+  id: string;
   firstName: string;
   lastName: string;
   userBackground: string;
@@ -15,7 +17,10 @@ export type TMessage = {
   message: string;
 };
 
-export type PaginationResponse<T> = {
-  itemsPerPage: T[];
-  total: number;
-};
+export class BaseDocumentResponse {
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+}
