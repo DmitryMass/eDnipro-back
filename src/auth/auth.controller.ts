@@ -21,12 +21,18 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ErrorFilter } from 'src/middleware/error.middleware';
-import type { TLogin, TMessage } from 'src/types/types';
+import {
+  CheckerResponse,
+  LoginResponse,
+  type TLogin,
+  type TMessage,
+} from 'src/types/types';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegistrationDto } from './dto/registration-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { MessageResponse } from 'src/types/classTypesForSwagger';
 
 @UseFilters(ErrorFilter)
 @ApiTags('User Authorization')
@@ -37,6 +43,7 @@ export class AuthController {
   @ApiOperation({ summary: 'User registration' })
   @ApiCreatedResponse({
     description: 'User has successfully created.',
+    type: MessageResponse,
   })
   @ApiBadRequestResponse({ description: 'This email is already existed!' })
   @ApiInternalServerErrorResponse({
@@ -49,7 +56,10 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'User Login' })
-  @ApiOkResponse({ description: 'The user has successfully logged in' })
+  @ApiOkResponse({
+    description: 'The user has successfully logged in',
+    type: LoginResponse,
+  })
   @ApiUnauthorizedResponse({ description: 'Incorrect authorization data.' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @Post('login')
@@ -63,6 +73,7 @@ export class AuthController {
   @ApiBearerAuth('Token')
   @ApiOkResponse({
     description: 'Profile has successfully got.',
+    type: CheckerResponse,
   })
   @ApiUnauthorizedResponse({
     description: 'Need user token for getting profile and checking token',

@@ -7,7 +7,7 @@ import { User } from 'src/user/schema/user.schema';
 import { BaseDocument } from 'src/utils/BaseDocument';
 import { File } from 'src/general-schemas/file.schema';
 
-enum Status {
+export enum Status {
   isOpen = 'isOpen',
   inProccess = 'inProccess',
   isClosed = 'isClosed',

@@ -1,42 +1,47 @@
 import {
-  Controller,
-  UseFilters,
-  Post,
   Body,
-  UploadedFile,
+  Controller,
   Delete,
+  Get,
   Param,
+  Post,
+  Put,
+  Query,
+  Request,
+  UploadedFile,
+  UseFilters,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
-  Request,
-  UseGuards,
-  Get,
-  Put,
-  Query,
 } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiConsumes,
-  ApiOperation,
   ApiBearerAuth,
-  ApiUnauthorizedResponse,
+  ApiConflictResponse,
+  ApiConsumes,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiConflictResponse,
+  ApiOperation,
   ApiQuery,
+  ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ErrorFilter } from 'src/middleware/error.middleware';
-import { ProjectService } from './project.service';
-import type { PaginationResponse, TMessage } from 'src/types/types';
+import {
+  MessageResponse,
+  PaginationProjectResponse,
+  ProjectResponse,
+} from 'src/types/classTypesForSwagger';
+import type { TMessage } from 'src/types/types';
 import { fileUploadInterceptor } from 'src/utils/fileUploadInterceptor';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Project } from './schema/project.schema';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectService } from './project.service';
+import { Project } from './schema/project.schema';
 
-@UseFilters(ErrorFilter)
+// @UseFilters(ErrorFilter)
 @Controller('project')
 @UseGuards(JwtAuthGuard)
 @ApiTags('Projects routes')
@@ -48,7 +53,10 @@ export class ProjectController {
   @ApiUnauthorizedResponse({
     description: 'User does not have access token. User unauthorized.',
   })
-  @ApiOkResponse({ description: 'Project has succesfully created' })
+  @ApiOkResponse({
+    description: 'Project has succesfully created',
+    type: MessageResponse,
+  })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(fileUploadInterceptor)
@@ -69,7 +77,10 @@ export class ProjectController {
 
   @ApiOperation({ summary: 'Delete the project' })
   @ApiBearerAuth('Token')
-  @ApiOkResponse({ description: 'Project has succesfully deleted' })
+  @ApiOkResponse({
+    description: 'Project has succesfully deleted',
+    type: MessageResponse,
+  })
   @ApiUnauthorizedResponse({
     description: 'User does not have access token. User unauthorized.',
   })
@@ -85,14 +96,17 @@ export class ProjectController {
 
   @ApiOperation({ summary: 'Get project' })
   @ApiBearerAuth('Token')
-  @ApiOkResponse({ description: 'Project has succesfully got' })
+  @ApiOkResponse({
+    description: 'Project has succesfully got',
+    type: ProjectResponse,
+  })
   @ApiUnauthorizedResponse({
     description: 'User does not have access token. User unauthorized.',
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @ApiNotFoundResponse({ description: 'Project not found' })
   @ApiConflictResponse({
-    description: 'Error when  the project',
+    description: 'Error when the project',
   })
   @Get('/:projectId')
   getOneProject(@Param('projectId') projectId: string): Promise<Project> {
@@ -101,7 +115,10 @@ export class ProjectController {
 
   @ApiOperation({ summary: 'Get projects' })
   @ApiBearerAuth('Token')
-  @ApiOkResponse({ description: 'Projects have succesfully got' })
+  @ApiOkResponse({
+    description: 'Projects have succesfully got',
+    type: PaginationProjectResponse,
+  })
   @ApiUnauthorizedResponse({
     description: 'User does not have access token. User unauthorized.',
   })
@@ -116,7 +133,7 @@ export class ProjectController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('sortBy') sortBy: string,
-  ): Promise<PaginationResponse<Project>> {
+  ): Promise<PaginationProjectResponse> {
     return this.projectService.getProjects(page, limit, sortBy);
   }
 
@@ -134,11 +151,16 @@ export class ProjectController {
   })
   @Get('search')
   getSearchedProjects(@Query('q') query: string): Promise<Project[]> {
+    console.log(1);
     return this.projectService.getSearchedProjects(query);
   }
 
   @ApiOperation({ summary: 'Update current project' })
   @ApiBearerAuth('Token')
+  @ApiOkResponse({
+    description: 'Project updated Successfully',
+    type: ProjectResponse,
+  })
   @ApiUnauthorizedResponse({
     description: 'User does not have access token. User unauthorized.',
   })
@@ -153,7 +175,7 @@ export class ProjectController {
     @Param('projectId') projectId: string,
     @UploadedFile()
     file: Express.Multer.File,
-  ): Promise<any> {
+  ): Promise<Project> {
     return this.projectService.updateProject(updateProjectDto, file, projectId);
   }
 }

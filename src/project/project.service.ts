@@ -1,19 +1,23 @@
 import {
-  Injectable,
   ConflictException,
-  NotFoundException,
+  Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Project } from './schema/project.schema';
 import mongoose, { Model } from 'mongoose';
-import type { PaginationResponse, TMessage } from 'src/types/types';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { User } from 'src/user/schema/user.schema';
 import { CloudinaryService } from 'src/cdn-cloudinary/cloudinary.service';
 import { File } from 'src/general-schemas/file.schema';
 import { Task } from 'src/task/schema/task.schema';
+import {
+  PaginationProjectResponse,
+  ProjectResponse,
+} from 'src/types/classTypesForSwagger';
+import type { TMessage } from 'src/types/types';
+import { User } from 'src/user/schema/user.schema';
+import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { Project } from './schema/project.schema';
 
 @Injectable()
 export class ProjectService {
@@ -163,7 +167,8 @@ export class ProjectService {
             model: 'File',
           },
         })
-        .populate('file');
+        .populate('file')
+        .populate('authorOfСreation');
 
       if (!project) {
         throw new NotFoundException(`Project by id: ${projectId} not found`);
@@ -181,7 +186,7 @@ export class ProjectService {
     page: number,
     limit: number,
     sortBy: string = 'asc',
-  ): Promise<PaginationResponse<Project>> {
+  ): Promise<PaginationProjectResponse> {
     const skip = (page - 1) * limit;
     try {
       const projectsLength = await this.projectModel.find();
@@ -191,12 +196,14 @@ export class ProjectService {
 
       const paginatedProjects = await this.projectModel
         .find()
+        .populate('authorOfСreation')
+        .populate('file')
         .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
         .skip(skip)
         .limit(limit);
 
       return {
-        itemsPerPage: paginatedProjects,
+        itemsPerPage: paginatedProjects as any,
         total: projectsLength.length,
       };
     } catch (err) {
@@ -204,7 +211,7 @@ export class ProjectService {
     }
   }
 
-  async getSearchedProjects(query: string): Promise<Project[]> {
+  async getSearchedProjects(query: string): Promise<any> {
     try {
       // Универсальный вариант поиска.
       // Выключает регистр, а так же можно расширить все категории по которым мы можем искать проекты, можно добавить description , author и так далее / строкой указываем параметры не нужные в запросе
@@ -214,13 +221,12 @@ export class ProjectService {
         },
         '-tasks -authorOfСreation -file',
       );
-
       if (!projects) {
         throw new NotFoundException('Projects not found');
       }
-
       return projects;
     } catch (err) {
+      console.log(err);
       throw new InternalServerErrorException(
         'Server error occured when searched projects',
       );
@@ -231,7 +237,7 @@ export class ProjectService {
     updateProjectDto: UpdateProjectDto,
     file: Express.Multer.File,
     projectId: string,
-  ): Promise<any> {
+  ): Promise<Project> {
     const transactionSession = await this.connection.startSession();
     const filePaths = {
       oldPath: '',
