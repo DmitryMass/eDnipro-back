@@ -1,16 +1,20 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { JwtModule } from '@nestjs/jwt';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { CloudinaryModule } from './cdn-cloudinary/cloudinary.module';
+import { ProjectModule } from './project/project.module';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
     AuthModule,
+    ProjectModule,
+    TaskModule,
+    CloudinaryModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath:
@@ -26,9 +30,6 @@ import { AuthModule } from './auth/auth.module';
         signOptions: { expiresIn: '3d' },
       }),
       inject: [ConfigService],
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src', 'uploadedFiles'),
     }),
   ],
   controllers: [AppController],

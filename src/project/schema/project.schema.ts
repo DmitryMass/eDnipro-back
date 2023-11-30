@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import { Task } from 'src/task/schema/task.schema';
 import { User } from 'src/user/schema/user.schema';
 import { BaseDocument } from 'src/utils/BaseDocument';
+import { File } from 'src/general-schemas/file.schema';
 
 @Schema({
   timestamps: true,
@@ -33,6 +34,13 @@ export class Project extends BaseDocument {
   @ApiProperty({ description: 'Tasks of current project', type: [Task] })
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }])
   tasks: Task[];
+
+  @ApiProperty({
+    example: 'model File Id',
+    description: 'ID of the file binded to this project.',
+  })
+  @Prop({ required: false, type: mongoose.Schema.Types.ObjectId, ref: 'File' })
+  file: File;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
