@@ -12,6 +12,7 @@ import {
   Request,
   UseGuards,
   Get,
+  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -33,6 +34,7 @@ import { fileUploadInterceptor } from 'src/utils/fileUploadInterceptor';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Project } from './schema/project.schema';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @UseFilters(ErrorFilter)
 @Controller('project')
@@ -46,6 +48,7 @@ export class ProjectController {
   @ApiUnauthorizedResponse({
     description: 'User does not have access token. User unauthorized.',
   })
+  @ApiOkResponse({ description: 'Project has succesfully created' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(fileUploadInterceptor)
@@ -132,5 +135,25 @@ export class ProjectController {
   @Get('search')
   getSearchedProjects(@Query('q') query: string): Promise<Project[]> {
     return this.projectService.getSearchedProjects(query);
+  }
+
+  @ApiOperation({ summary: 'Update current project' })
+  @ApiBearerAuth('Token')
+  @ApiUnauthorizedResponse({
+    description: 'User does not have access token. User unauthorized.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiNotFoundResponse({ description: 'Project not found' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(fileUploadInterceptor)
+  @UsePipes(new ValidationPipe())
+  @Put('update-project/:projectId')
+  updateProject(
+    @Body() updateProjectDto: UpdateProjectDto,
+    @Param('projectId') projectId: string,
+    @UploadedFile()
+    file: Express.Multer.File,
+  ): Promise<any> {
+    return this.projectService.updateProject(updateProjectDto, file, projectId);
   }
 }

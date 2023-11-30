@@ -13,6 +13,7 @@ import { User } from 'src/user/schema/user.schema';
 import { CloudinaryService } from 'src/cdn-cloudinary/cloudinary.service';
 import { File } from 'src/general-schemas/file.schema';
 import { Task } from 'src/task/schema/task.schema';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -223,6 +224,90 @@ export class ProjectService {
       throw new InternalServerErrorException(
         'Server error occured when searched projects',
       );
+    }
+  }
+
+  async updateProject(
+    updateProjectDto: UpdateProjectDto,
+    file: Express.Multer.File,
+    projectId: string,
+  ): Promise<any> {
+    const transactionSession = await this.connection.startSession();
+    const filePaths = {
+      oldPath: '',
+      newPath: '',
+    };
+    try {
+      transactionSession.startTransaction();
+      const currentProject = await this.projectModel
+        .findById(projectId)
+        .populate('file')
+        .session(transactionSession);
+
+      if (!currentProject) {
+        throw new NotFoundException('Project not found');
+      }
+
+      if (file) {
+        const cloudinaryResult = await this.cloudinaryService.uploadImage(
+          file.buffer,
+        );
+        filePaths.newPath = cloudinaryResult.public_id;
+        const newFile = new this.fileModel({
+          file_path: cloudinaryResult.public_id,
+          file_contentType: file.mimetype,
+          file_originalName: file.originalname,
+        });
+        await newFile.save({ session: transactionSession });
+
+        if (currentProject.file) {
+          filePaths.oldPath = currentProject.file.file_path;
+          await this.fileModel
+            .findByIdAndDelete(currentProject.file.id)
+            .session(transactionSession);
+        }
+
+        const updatedProject = await this.projectModel
+          .findByIdAndUpdate(
+            projectId,
+            {
+              $set: { ...updateProjectDto, file: newFile },
+            },
+            { new: true },
+          )
+          .session(transactionSession);
+
+        if (filePaths.oldPath) {
+          await this.cloudinaryService.deleteImage(filePaths.oldPath);
+        }
+
+        await transactionSession.commitTransaction();
+        return updatedProject;
+      }
+
+      const project = await this.projectModel
+        .findByIdAndUpdate(
+          projectId,
+          {
+            $set: { ...updateProjectDto },
+          },
+          { new: true },
+        )
+        .populate('file')
+        .session(transactionSession);
+
+      await transactionSession.commitTransaction();
+      return project;
+    } catch (err) {
+      await transactionSession.abortTransaction();
+      if (filePaths.newPath) {
+        await this.cloudinaryService.deleteImage(filePaths.newPath);
+      }
+      throw new InternalServerErrorException(
+        'Server error occured when updating the project',
+      );
+    } finally {
+      transactionSession.endSession();
     }
   }
 }

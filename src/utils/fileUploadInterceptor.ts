@@ -4,6 +4,9 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 export const fileUploadInterceptor = FileInterceptor('file', {
+  // Тут описан рабочий вариант загрузки статики в папку, решил попробовать новое и использовать CDN
+  // Не указано сколько файлов должно загружаться, по этому оставил вариатнт с 1 файлом (ресширитть до множества не является проблемой)
+
   // storage: diskStorage({
   //   destination: './src/uploadedFiles',
   //   filename: (req, file, callback) => {
