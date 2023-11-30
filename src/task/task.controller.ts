@@ -8,6 +8,9 @@ import {
   UseInterceptors,
   UsePipes,
   ValidationPipe,
+  Param,
+  Get,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -27,6 +30,7 @@ import { TaskService } from './task.service';
 
 import { MessageResponse, TaskResponse } from 'src/types/classTypesForSwagger';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { Task } from './schema/task.schema';
 
 @UseFilters(ErrorFilter)
 @Controller('task')
@@ -58,5 +62,37 @@ export class TaskController {
     file: Express.Multer.File,
   ): Promise<TMessage> {
     return this.taskService.createTask(createTaskDto, file);
+  }
+
+  // В проекте не используем (добавил по тз как crud)
+  @ApiOperation({ summary: 'Get task by id' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiOkResponse({
+    description: 'Task has successfully got',
+    type: TaskResponse,
+  })
+  @ApiBearerAuth('Token')
+  @ApiNotFoundResponse({ description: 'Task not found' })
+  @ApiUnauthorizedResponse({
+    description: 'User does not have access token. User unauthorized.',
+  })
+  @Get(':taskId')
+  getTasks(@Param('taskId') taskId: string): Promise<Task> {
+    return this.taskService.getTask(taskId);
+  }
+
+  @ApiOperation({ summary: 'Delete task by id' })
+  @ApiOkResponse({
+    description: 'Task has successfully deleted',
+    type: MessageResponse,
+  })
+  @ApiBearerAuth('Token')
+  @ApiUnauthorizedResponse({
+    description: 'User does not have access token. User unauthorized.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @Delete('delete/:taskId')
+  deleteTask(@Param('taskId') taskId: string): Promise<TMessage> {
+    return this.taskService.deleteTask(taskId);
   }
 }

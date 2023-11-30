@@ -97,4 +97,57 @@ export class TaskService {
       transactionSession.endSession();
     }
   }
+
+  async getTask(taskId: string): Promise<Task> {
+    try {
+      const task = await this.taskModel
+        .findById(taskId)
+        .populate('file')
+        .populate('perfomingBy');
+      if (!task) {
+        throw new NotFoundException('Task not found');
+      }
+      return task;
+    } catch (err) {
+      throw new InternalServerErrorException('Internal server error');
+    }
+  }
+
+  async deleteTask(taskId: string): Promise<TMessage> {
+    const transactionSession = await this.connection.startSession();
+    try {
+      transactionSession.startTransaction();
+
+      const task = await this.taskModel
+        .findById(taskId)
+        .populate('file')
+        .populate('projectId')
+        .session(transactionSession);
+
+      await this.projectModel
+        .findByIdAndUpdate(task.projectId.id, {
+          $pull: { tasks: task.id },
+        })
+        .session(transactionSession);
+
+      if (task.file) {
+        await this.fileModel
+          .findByIdAndDelete(task.file.id)
+          .session(transactionSession);
+        await this.cloudinaryService.deleteImage(task.file.file_path);
+      }
+
+      await this.taskModel
+        .findByIdAndDelete(taskId)
+        .session(transactionSession);
+
+      await transactionSession.commitTransaction();
+      return { message: 'Task has successfully deleted' };
+    } catch (err) {
+      await transactionSession.abortTransaction();
+      throw new InternalServerErrorException('Error when creating new project');
+    } finally {
+      transactionSession.endSession();
+    }
+  }
 }

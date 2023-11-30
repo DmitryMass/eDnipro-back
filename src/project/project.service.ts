@@ -228,7 +228,6 @@ export class ProjectService {
 
       return projects;
     } catch (err) {
-      console.log(err);
       throw new InternalServerErrorException(
         'Server error occured when searched projects',
       );
