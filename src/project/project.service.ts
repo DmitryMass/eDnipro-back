@@ -90,7 +90,7 @@ export class ProjectService {
     }
   }
 
-  async deleteProject(projectId: string): Promise<any> {
+  async deleteProject(projectId: string): Promise<TMessage> {
     const transactionSession = await this.connection.startSession();
     try {
       transactionSession.startTransaction();
@@ -147,6 +147,32 @@ export class ProjectService {
       throw new ConflictException('Error when deleting the project');
     } finally {
       transactionSession.endSession();
+    }
+  }
+
+  async getOneProject(projectId: string): Promise<Project> {
+    try {
+      const project = await this.projectModel
+        .findById(projectId)
+        .populate({
+          path: 'tasks',
+          model: 'Task',
+          populate: {
+            path: 'file',
+            model: 'File',
+          },
+        })
+        .populate('file');
+
+      if (!project) {
+        throw new NotFoundException(`Project by id: ${projectId} not found`);
+      }
+
+      return project;
+    } catch (err) {
+      throw new InternalServerErrorException(
+        'Server error occured when getting the project',
+      );
     }
   }
 

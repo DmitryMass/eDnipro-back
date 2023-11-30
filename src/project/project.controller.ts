@@ -76,8 +76,24 @@ export class ProjectController {
     description: 'Error when deleting the project',
   })
   @Delete('/:projectId')
-  deleteProject(@Param('projectId') projectId: string): Promise<any> {
+  deleteProject(@Param('projectId') projectId: string): Promise<TMessage> {
     return this.projectService.deleteProject(projectId);
+  }
+
+  @ApiOperation({ summary: 'Get project' })
+  @ApiBearerAuth('Token')
+  @ApiOkResponse({ description: 'Project has succesfully got' })
+  @ApiUnauthorizedResponse({
+    description: 'User does not have access token. User unauthorized.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiNotFoundResponse({ description: 'Project not found' })
+  @ApiConflictResponse({
+    description: 'Error when  the project',
+  })
+  @Get('/:projectId')
+  getOneProject(@Param('projectId') projectId: string): Promise<Project> {
+    return this.projectService.getOneProject(projectId);
   }
 
   @ApiOperation({ summary: 'Get projects' })
@@ -89,7 +105,7 @@ export class ProjectController {
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @ApiNotFoundResponse({ description: 'Projects not found' })
   @ApiConflictResponse({
-    description: 'Error when deleting the project',
+    description: 'Error when getting the projects',
   })
   @Get()
   @ApiQuery({ name: 'sortBy', required: false, type: String })
@@ -101,7 +117,7 @@ export class ProjectController {
     return this.projectService.getProjects(page, limit, sortBy);
   }
 
-  @ApiOperation({ summary: 'Search project by Title' })
+  @ApiOperation({ summary: 'Search projects by Title' })
   @ApiBearerAuth('Token')
   @ApiOkResponse({
     description: 'Projects have successfully searched',
