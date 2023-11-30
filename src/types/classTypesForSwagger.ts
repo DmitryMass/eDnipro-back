@@ -90,6 +90,17 @@ export class ProjectResponse extends BaseDocumentResponse {
   file: FileResponse;
 }
 
+export class SearchedProjectsResponse {
+  @ApiProperty()
+  _id: string;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  description: string;
+}
+
 export class PaginationProjectResponse {
   @ApiProperty({ type: ProjectResponse, isArray: true })
   itemsPerPage: ProjectResponse[];

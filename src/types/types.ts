@@ -24,29 +24,3 @@ export class BaseDocumentResponse {
   @ApiProperty()
   updatedAt: Date;
 }
-
-export class LoginResponse {
-  @ApiProperty()
-  id: string;
-  @ApiProperty()
-  firstName: string;
-  @ApiProperty()
-  lastName: string;
-  @ApiProperty()
-  userBackground: string;
-  @ApiProperty()
-  email: string;
-  @ApiProperty()
-  token: string;
-}
-
-export class CheckerResponse {
-  @ApiProperty()
-  id: string;
-  @ApiProperty()
-  email: string;
-  @ApiProperty()
-  firstName: string;
-  @ApiProperty()
-  lastName: string;
-}

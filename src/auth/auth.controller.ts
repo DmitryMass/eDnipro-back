@@ -21,18 +21,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ErrorFilter } from 'src/middleware/error.middleware';
-import {
-  CheckerResponse,
-  LoginResponse,
-  type TLogin,
-  type TMessage,
-} from 'src/types/types';
+import { type TLogin, type TMessage } from 'src/types/types';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegistrationDto } from './dto/registration-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { MessageResponse } from 'src/types/classTypesForSwagger';
 
 @UseFilters(ErrorFilter)
 @ApiTags('User Authorization')

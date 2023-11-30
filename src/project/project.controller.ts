@@ -33,6 +33,7 @@ import {
   MessageResponse,
   PaginationProjectResponse,
   ProjectResponse,
+  SearchedProjectsResponse,
 } from 'src/types/classTypesForSwagger';
 import type { TMessage } from 'src/types/types';
 import { fileUploadInterceptor } from 'src/utils/fileUploadInterceptor';
@@ -43,7 +44,7 @@ import { Project } from './schema/project.schema';
 
 @UseFilters(ErrorFilter)
 @Controller('project')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @ApiTags('Projects routes')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
@@ -137,21 +138,21 @@ export class ProjectController {
     return this.projectService.getProjects(page, limit, sortBy);
   }
 
-  // @ApiOperation({ summary: 'Search projects by Title' })
-  // @ApiBearerAuth('Token')
-  // @ApiOkResponse({
-  //   description: 'Projects have successfully searched',
-  // })
-  // @ApiUnauthorizedResponse({
-  //   description: 'User does not have Token. User Unauthorized.',
-  // })
-  // @ApiNotFoundResponse({ description: 'Projects not found' })
-  // // @ApiInternalServerErrorResponse({
-  // //   description: 'An error occurred when searching proejcts.',
-  // // })
-  @Get('search')
+  @ApiOperation({ summary: 'Search projects by Title' })
+  @ApiBearerAuth('Token')
+  @ApiOkResponse({
+    description: 'Projects have successfully searched',
+    type: [SearchedProjectsResponse],
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User does not have Token. User Unauthorized.',
+  })
+  @ApiNotFoundResponse({ description: 'Projects not found' })
+  @ApiInternalServerErrorResponse({
+    description: 'An error occurred when searching proejcts.',
+  })
+  @Get('search/by')
   getSearchedProjects(@Query('q') query: string): Promise<Project[]> {
-    console.log(1);
     return this.projectService.getSearchedProjects(query);
   }
 
