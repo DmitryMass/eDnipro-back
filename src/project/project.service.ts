@@ -211,7 +211,7 @@ export class ProjectService {
     }
   }
 
-  async getSearchedProjects(query: string): Promise<any> {
+  async getSearchedProjects(query: string): Promise<Project[]> {
     try {
       // Универсальный вариант поиска.
       // Выключает регистр, а так же можно расширить все категории по которым мы можем искать проекты, можно добавить description , author и так далее / строкой указываем параметры не нужные в запросе
@@ -221,9 +221,11 @@ export class ProjectService {
         },
         '-tasks -authorOfСreation -file',
       );
+
       if (!projects) {
         throw new NotFoundException('Projects not found');
       }
+
       return projects;
     } catch (err) {
       console.log(err);

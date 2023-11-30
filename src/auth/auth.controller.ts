@@ -43,7 +43,6 @@ export class AuthController {
   @ApiOperation({ summary: 'User registration' })
   @ApiCreatedResponse({
     description: 'User has successfully created.',
-    type: MessageResponse,
   })
   @ApiBadRequestResponse({ description: 'This email is already existed!' })
   @ApiInternalServerErrorResponse({
@@ -58,7 +57,6 @@ export class AuthController {
   @ApiOperation({ summary: 'User Login' })
   @ApiOkResponse({
     description: 'The user has successfully logged in',
-    type: LoginResponse,
   })
   @ApiUnauthorizedResponse({ description: 'Incorrect authorization data.' })
   @ApiNotFoundResponse({ description: 'User not found' })
@@ -73,7 +71,6 @@ export class AuthController {
   @ApiBearerAuth('Token')
   @ApiOkResponse({
     description: 'Profile has successfully got.',
-    type: CheckerResponse,
   })
   @ApiUnauthorizedResponse({
     description: 'Need user token for getting profile and checking token',

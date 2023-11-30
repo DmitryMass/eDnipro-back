@@ -41,9 +41,9 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectService } from './project.service';
 import { Project } from './schema/project.schema';
 
-// @UseFilters(ErrorFilter)
+@UseFilters(ErrorFilter)
 @Controller('project')
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @ApiTags('Projects routes')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
@@ -137,18 +137,18 @@ export class ProjectController {
     return this.projectService.getProjects(page, limit, sortBy);
   }
 
-  @ApiOperation({ summary: 'Search projects by Title' })
-  @ApiBearerAuth('Token')
-  @ApiOkResponse({
-    description: 'Projects have successfully searched',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'User does not have Token. User Unauthorized.',
-  })
-  @ApiNotFoundResponse({ description: 'Projects not found' })
-  @ApiInternalServerErrorResponse({
-    description: 'An error occurred when searching proejcts.',
-  })
+  // @ApiOperation({ summary: 'Search projects by Title' })
+  // @ApiBearerAuth('Token')
+  // @ApiOkResponse({
+  //   description: 'Projects have successfully searched',
+  // })
+  // @ApiUnauthorizedResponse({
+  //   description: 'User does not have Token. User Unauthorized.',
+  // })
+  // @ApiNotFoundResponse({ description: 'Projects not found' })
+  // // @ApiInternalServerErrorResponse({
+  // //   description: 'An error occurred when searching proejcts.',
+  // // })
   @Get('search')
   getSearchedProjects(@Query('q') query: string): Promise<Project[]> {
     console.log(1);
