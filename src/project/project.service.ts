@@ -217,7 +217,7 @@ export class ProjectService {
   async getProjects(
     page: number,
     limit: number,
-    sortBy: string = 'asc',
+    sortBy: string = 'desc',
   ): Promise<PaginationProjectResponse> {
     const skip = (page - 1) * limit;
     try {
@@ -230,7 +230,7 @@ export class ProjectService {
         .find()
         .populate('authorOfСreation')
         .populate('file')
-        .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+        .sort({ ['createdAt']: sortBy === 'desc' ? 'desc' : 'asc' })
         .skip(skip)
         .limit(limit);
 
@@ -239,7 +239,7 @@ export class ProjectService {
         total: projectsLength.length,
       };
     } catch (err) {
-      throw new ConflictException('Error occured when getting projects');
+      throw new ConflictException(err?.response?.message);
     }
   }
 

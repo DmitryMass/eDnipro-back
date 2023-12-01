@@ -55,10 +55,12 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     const passwordIsMatch = await bcrypt.compare(password, user.password);
+
     if (user && passwordIsMatch) {
       return user;
+    } else {
+      throw new UnauthorizedException('Incorrect User Data!');
     }
-    throw new UnauthorizedException('Incorrect User Data!');
   }
 
   async login(user: User): Promise<TLogin> {
