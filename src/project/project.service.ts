@@ -9,11 +9,7 @@ import mongoose, { Model } from 'mongoose';
 import { CloudinaryService } from 'src/cdn-cloudinary/cloudinary.service';
 import { File } from 'src/general-schemas/file.schema';
 import { Task } from 'src/task/schema/task.schema';
-import {
-  PaginationProjectResponse,
-  ProjectResponse,
-  TaskByProjectIdResponse,
-} from 'src/types/classTypesForSwagger';
+import { PaginationProjectResponse } from 'src/types/classTypesForSwagger';
 import type { TMessage } from 'src/types/types';
 import { User } from 'src/user/schema/user.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -47,7 +43,7 @@ export class ProjectService {
         .session(transactionSession);
 
       if (!user) {
-        throw new NotFoundException('Creator(user) not found');
+        throw new NotFoundException('Creator (user) not found');
       }
 
       if (!file) {
@@ -90,7 +86,7 @@ export class ProjectService {
       if (fileId) {
         await this.cloudinaryService.deleteImage(fileId);
       }
-      throw new ConflictException('Error when creating new project');
+      throw new ConflictException(err.response.message as string);
     } finally {
       transactionSession.endSession();
     }
