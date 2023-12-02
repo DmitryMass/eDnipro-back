@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -30,6 +29,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ErrorFilter } from 'src/middleware/error.middleware';
+import { Task } from 'src/task/schema/task.schema';
 import {
   MessageResponse,
   PaginationProjectResponse,
@@ -43,7 +43,6 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectService } from './project.service';
 import { Project } from './schema/project.schema';
-import { Task } from 'src/task/schema/task.schema';
 
 @UseFilters(ErrorFilter)
 @Controller('project')

@@ -66,7 +66,6 @@ export class TaskController {
     return this.taskService.createTask(createTaskDto, file);
   }
 
-  // В проекте не используем (добавил по тз как crud)
   @ApiOperation({ summary: 'Get task by id' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @ApiOkResponse({
@@ -79,7 +78,7 @@ export class TaskController {
     description: 'User does not have access token. User unauthorized.',
   })
   @Get(':taskId')
-  getTasks(@Param('taskId') taskId: string): Promise<Task> {
+  getTask(@Param('taskId') taskId: string): Promise<Task> {
     return this.taskService.getTask(taskId);
   }
 

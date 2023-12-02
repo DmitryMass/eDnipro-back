@@ -156,14 +156,15 @@ export class ProjectService {
     projectId: string,
     page: number = 1,
     limit: number = 6,
-    sortBy: string = 'asc',
+    sortBy: string = 'desc',
     filteredStatus: string = 'all',
   ): Promise<{ project: Project; tasks: Task[]; total: number }> {
     const skip = (page - 1) * limit;
     try {
       const project = await this.projectModel
         .findById(projectId)
-        .select('-authorOfСreation -file');
+        .select('-authorOfСreation')
+        .populate('file');
 
       if (!project) {
         throw new NotFoundException('Project not found');
@@ -173,7 +174,7 @@ export class ProjectService {
           .find({ projectId })
           .populate('file')
           .populate('perfomingBy')
-          .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+          .sort({ ['createdAt']: sortBy === 'desc' ? 'desc' : 'asc' })
           .skip(skip)
           .limit(limit);
         if (!tasks) {
@@ -191,7 +192,7 @@ export class ProjectService {
         .find({ projectId, status: filteredStatus })
         .populate('file')
         .populate('perfomingBy')
-        .sort({ ['createdAt']: sortBy === 'asc' ? 'asc' : 'desc' })
+        .sort({ ['createdAt']: sortBy === 'desc' ? 'desc' : 'asc' })
         .skip(skip)
         .limit(limit);
       if (!tasks) {

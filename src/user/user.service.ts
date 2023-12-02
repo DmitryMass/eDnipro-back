@@ -5,9 +5,6 @@ import {
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { CloudinaryService } from 'src/cdn-cloudinary/cloudinary.service';
-import { File } from 'src/general-schemas/file.schema';
-import { Project } from 'src/project/schema/project.schema';
 import { ChangeStatusDto } from 'src/task/dto/change-task-status.dto';
 import { Status, Task } from 'src/task/schema/task.schema';
 import { TMessage } from 'src/types/types';
@@ -17,11 +14,8 @@ import { User } from './schema/user.schema';
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
-    @InjectModel(Project.name) private projectModel: Model<Project>,
-    @InjectModel(File.name) private fileModel: Model<File>,
     @InjectModel(Task.name) private taskModel: Model<Task>,
     @InjectConnection() private readonly connection: mongoose.Connection,
-    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async bindTaskToUser(userId: string, taskId: string): Promise<TMessage> {

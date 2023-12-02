@@ -2,12 +2,12 @@ import {
   Body,
   Controller,
   Param,
-  Patch,
   Request,
   UseFilters,
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -54,6 +54,7 @@ export class UserController {
     @Request() req,
     @Param('taskId') taskId: string,
   ): Promise<TMessage> {
+    console.log(1);
     return this.userService.bindTaskToUser(req.user.id, taskId);
   }
 
