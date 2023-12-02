@@ -19,10 +19,7 @@ import { UserModule } from './user/user.module';
     CloudinaryModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath:
-        process.env.NODE_ENV === 'production'
-          ? '.env.production'
-          : '.env.development',
+      envFilePath: process.env.NODE_ENV ? '.env' : '.env.development',
     }),
     MongooseModule.forRoot(process.env.MONGO_URI),
     JwtModule.registerAsync({
